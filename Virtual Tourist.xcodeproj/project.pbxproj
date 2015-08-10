@@ -14,6 +14,9 @@
 		8FD094401B785F7B00CE817C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8FD0943F1B785F7B00CE817C /* Images.xcassets */; };
 		8FD094431B785F7B00CE817C /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8FD094411B785F7B00CE817C /* LaunchScreen.xib */; };
 		8FD0944F1B785F7B00CE817C /* Virtual_TouristTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD0944E1B785F7B00CE817C /* Virtual_TouristTests.swift */; };
+		8FD094591B785FE500CE817C /* CoreDataStackManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD094581B785FE500CE817C /* CoreDataStackManager.swift */; };
+		8FD0945D1B78629500CE817C /* Pin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD0945C1B78629500CE817C /* Pin.swift */; };
+		8FD0945F1B78656F00CE817C /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD0945E1B78656F00CE817C /* Photo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +41,9 @@
 		8FD094481B785F7B00CE817C /* Virtual TouristTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Virtual TouristTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FD0944D1B785F7B00CE817C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8FD0944E1B785F7B00CE817C /* Virtual_TouristTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Virtual_TouristTests.swift; sourceTree = "<group>"; };
+		8FD094581B785FE500CE817C /* CoreDataStackManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStackManager.swift; sourceTree = "<group>"; };
+		8FD0945C1B78629500CE817C /* Pin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pin.swift; sourceTree = "<group>"; };
+		8FD0945E1B78656F00CE817C /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,12 +85,13 @@
 		8FD094321B785F7B00CE817C /* Virtual Tourist */ = {
 			isa = PBXGroup;
 			children = (
+				8FD0945B1B78627C00CE817C /* API */,
+				8FD0945A1B78627500CE817C /* Model */,
 				8FD094351B785F7B00CE817C /* AppDelegate.swift */,
 				8FD0943A1B785F7B00CE817C /* ViewController.swift */,
 				8FD0943C1B785F7B00CE817C /* Main.storyboard */,
 				8FD0943F1B785F7B00CE817C /* Images.xcassets */,
 				8FD094411B785F7B00CE817C /* LaunchScreen.xib */,
-				8FD094371B785F7B00CE817C /* Virtual_Tourist.xcdatamodeld */,
 				8FD094331B785F7B00CE817C /* Supporting Files */,
 			);
 			path = "Virtual Tourist";
@@ -113,6 +120,24 @@
 				8FD0944D1B785F7B00CE817C /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		8FD0945A1B78627500CE817C /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				8FD094371B785F7B00CE817C /* Virtual_Tourist.xcdatamodeld */,
+				8FD094581B785FE500CE817C /* CoreDataStackManager.swift */,
+				8FD0945C1B78629500CE817C /* Pin.swift */,
+				8FD0945E1B78656F00CE817C /* Photo.swift */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		8FD0945B1B78627C00CE817C /* API */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = API;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -215,7 +240,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8FD0945F1B78656F00CE817C /* Photo.swift in Sources */,
+				8FD0945D1B78629500CE817C /* Pin.swift in Sources */,
 				8FD0943B1B785F7B00CE817C /* ViewController.swift in Sources */,
+				8FD094591B785FE500CE817C /* CoreDataStackManager.swift in Sources */,
 				8FD094391B785F7B00CE817C /* Virtual_Tourist.xcdatamodeld in Sources */,
 				8FD094361B785F7B00CE817C /* AppDelegate.swift in Sources */,
 			);
