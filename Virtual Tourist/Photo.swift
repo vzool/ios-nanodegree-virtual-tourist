@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Abdelaziz Elrashed. All rights reserved.
 //
 
+import Foundation
 import CoreData
 
 @objc(Photo)
@@ -13,11 +14,9 @@ import CoreData
 class Photo : NSManagedObject{
     
     struct Keys{
-        static let ID = "id"
         static let PATH = "path"
     }
     
-    @NSManaged var id: NSNumber
     @NSManaged var path:String?
     @NSManaged var pin:Pin?
     
@@ -25,14 +24,11 @@ class Photo : NSManagedObject{
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
     
-    init(dict: [String: AnyObject], context: NSManagedObjectContext){
+    init(_path: String, context: NSManagedObjectContext){
         
         let entity = NSEntityDescription.entityForName("Photo", inManagedObjectContext: context)
         super.init(entity: entity!, insertIntoManagedObjectContext: context)
         
-        id = dict[Keys.ID] as! NSNumber
-        path = dict[Keys.PATH] as? String
-        
+        path = _path
     }
-    
 }

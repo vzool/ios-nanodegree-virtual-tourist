@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Abdelaziz Elrashed. All rights reserved.
 //
 
+import Foundation
 import CoreData
 
 @objc(Pin)
@@ -13,17 +14,23 @@ import CoreData
 class Pin : NSManagedObject{
     
     struct Keys {
-        static let ID = "id"
-        static let X = "x"
-        static let Y = "y"
+        static let LAT = "lat"
+        static let LON = "lon"
         static let CreatedDate = "created_date"
+        
+        static let TotalPageCount = "total_page_count"
+        static let CurrentPage = "current_page"
+        static let TotalImages = "total_images"
     }
     
-    @NSManaged var id: NSNumber
-    @NSManaged var x: NSNumber
-    @NSManaged var y: NSNumber
-    @NSManaged var createdDate:NSDate?
+    @NSManaged var lat: String
+    @NSManaged var lon: String
+    @NSManaged var created_date:NSDate?
     @NSManaged var photos:[Photo]
+    
+    @NSManaged var total_page_count:NSNumber
+    @NSManaged var current_page:NSNumber
+    @NSManaged var total_images:NSNumber
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -34,10 +41,11 @@ class Pin : NSManagedObject{
         let entity = NSEntityDescription.entityForName("Pin", inManagedObjectContext: context)
         super.init(entity: entity!, insertIntoManagedObjectContext: context)
         
-        id = dict[Keys.ID] as! NSNumber
-        x = dict[Keys.X] as! NSNumber
-        y = dict[Keys.Y] as! NSNumber
+        lat = dict[Keys.LAT] as! String
+        lon = dict[Keys.LON] as! String
         
-        createdDate = NSDate()
+        created_date = NSDate()
     }
 }
+
+
