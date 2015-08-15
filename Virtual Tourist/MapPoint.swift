@@ -11,5 +11,4 @@ import MapKit
 class MapPoint: MKPointAnnotation {
 
     var pin:Pin!
-    
 }

@@ -56,8 +56,6 @@ class Flickr{
     
     static internal func createBoundingBoxString(latitude: NSNumber, longitude:NSNumber) -> String {
         
-        println("createBoundingBoxString(\(latitude), \(longitude)) called.")
-        
         let lat = latitude.doubleValue
         let lon = longitude.doubleValue
         
@@ -87,7 +85,7 @@ class Flickr{
                 println("Could not complete the request \(error)")
                 
                 dispatch_async(dispatch_get_main_queue()){
-                    (view as? MapViewController)!.networkActivityError(error)
+                    (view as? MapViewController)!.networkActivityError("\(error)")
                 }
                 
             } else {
@@ -111,11 +109,21 @@ class Flickr{
                         }
                         
                     } else {
+                        
                         println("Cant find key 'pages' in \(photosDictionary)")
+                        
+                        dispatch_async(dispatch_get_main_queue()){
+                            (view as? MapViewController)!.networkActivityError("Cant find key 'pages' in \(photosDictionary)")
+                        }
                     }
                     
                 } else {
+                    
                     println("Cant find key 'photos' in \(parsedResult)")
+                    
+                    dispatch_async(dispatch_get_main_queue()){
+                        (view as? MapViewController)!.networkActivityError("Cant find key 'photos' in \(parsedResult)")
+                    }
                 }
             }
         }
@@ -144,7 +152,7 @@ class Flickr{
                 println("Could not complete the request \(error)")
                 
                 dispatch_async(dispatch_get_main_queue()){
-                    (view as? PinImagesViewController)!.networkActivityError(error)
+                    (view as? PinImagesViewController)!.networkActivityError("\(error)")
                 }
                 
             } else {
@@ -162,7 +170,13 @@ class Flickr{
                     }
                     
                 } else {
+                    
                     println("Cant find key 'photos' in \(parsedResult)")
+                    
+                    dispatch_async(dispatch_get_main_queue()){
+                        (view as? PinImagesViewController)!.networkActivityError("Cant find key 'photos' in \(parsedResult)")
+                    }
+                    
                 }
             }
         }

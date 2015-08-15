@@ -43,7 +43,23 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
     }
     
     func exitApp(){
-        exit(0)
+        
+        var alert = UIAlertController(title: "Alert", message: "Do you want to Exit?", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: nil))
+        alert.addAction(UIAlertAction(title: "Yes", style: .Default, handler: { action in
+            switch action.style{
+            case .Default:
+                exit(0)
+                
+            case .Cancel:
+                return
+                
+            case .Destructive:
+                return
+            }
+        }))
+        
+        self.presentViewController(alert, animated: true, completion: nil)
     }
     
     var long_pressed_once = false
@@ -132,9 +148,9 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         showIndicator(true)
     }
     
-    func networkActivityError(error:NSError){
+    func networkActivityError(error:String){
         
-        var alert = UIAlertController(title: "Alert", message: "\(error)", preferredStyle: UIAlertControllerStyle.Alert)
+        var alert = UIAlertController(title: "Alert", message: error, preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
         
         self.presentViewController(alert, animated: true, completion: nil)
@@ -182,11 +198,16 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                 
                 selected_pin = pin.pin
 
+                /* All pin images should be saved in order to ignore call newCollection() */
+                /* So, I made a Check Logic Sequence of all photo.is_saved in pin */
+                /* Start with True condition Then cancate all conditons after them from photo.is_saved */
                 var saved_correctly = true
                 for photo in pin.pin.photos{
+                    /* Redundant Logic = Last Logic && New Logic  */
                     saved_correctly = saved_correctly && photo.is_saved
                 }
                 
+                /* if all photo.is_saved in pin object are True next section will play */
                 if saved_correctly{
                     pin.pin.is_images_saved = saved_correctly
                     CoreDataStackManager.sharedInstance().saveContext()

@@ -71,28 +71,28 @@ class PinImagesViewController: UIViewController, MKMapViewDelegate, NSFetchedRes
         
         let photo = pin.photos[indexPath.item]
         
-        if photo.is_saved {
+        if photo.path != nil{
             
             println("# READ IMAGE FROM CACHE #")
             
-            cell.imageView.image = self.loadImageFromDocument(photo.path!)
+            cell.imageView.image = DFM.loadImageFromDocument(photo.path!)
             
         }else{
             
             println("# DOWNLOAD IMAGE FROM WWW #")
             
-            getDataFromUrl(NSURL(string: photo.path!)!) { data in
+            getDataFromUrl(NSURL(string: photo.url!)!) { data in
                 
                 dispatch_async(dispatch_get_main_queue()) {
                     
                     if let data = data {
                         
-                        var imageUrl = NSURL(fileURLWithPath: photo.path!)
+                        var imageUrl = NSURL(fileURLWithPath: photo.url!)
                         var fileName = imageUrl?.lastPathComponent
                         
                         let image = UIImage(data: data)
                         
-                        let imagePath = self.saveImageToDocument(image!, fileName: fileName!)
+                        let imagePath = DFM.saveImageToDocument(image!, fileName: fileName!)
                         photo.path = imagePath
                         
                         cell.imageView.image = image
@@ -130,7 +130,8 @@ class PinImagesViewController: UIViewController, MKMapViewDelegate, NSFetchedRes
         alert.addAction(UIAlertAction(title: "Yes", style: .Default, handler: { action in
             switch action.style{
             case .Default:
-                self.deleteImageFromDocument(photo.path!)
+                
+                DFM.deleteImageFromDocument(photo.path!)
                 
                 self.sharedContext.deleteObject(photo)
                 
@@ -158,7 +159,10 @@ class PinImagesViewController: UIViewController, MKMapViewDelegate, NSFetchedRes
     func newCollection(){
         
         for photo in pin.photos{
-            deleteImageFromDocument(photo.path!)
+            if photo.path != nil{
+                DFM.deleteImageFromDocument(photo.path!)
+            }
+            
             sharedContext.deleteObject(photo)
         }
         
@@ -207,7 +211,7 @@ class PinImagesViewController: UIViewController, MKMapViewDelegate, NSFetchedRes
             
             if let url_m = photo["url_m"] as? String{
                 
-                var p = Photo(_path: url_m, context: sharedContext)
+                var p = Photo(_url: url_m, context: sharedContext)
                 p.pin = pin
                 
                 CoreDataStackManager.sharedInstance().saveContext()
@@ -239,61 +243,11 @@ class PinImagesViewController: UIViewController, MKMapViewDelegate, NSFetchedRes
         navigationItem.title = "Loading..."
     }
     
-    func networkActivityError(error:NSError){
+    func networkActivityError(error:String){
         
-        var alert = UIAlertController(title: "Alert", message: "\(error)", preferredStyle: UIAlertControllerStyle.Alert)
+        var alert = UIAlertController(title: "Alert", message: error, preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
         
         self.presentViewController(alert, animated: true, completion: nil)
-    }
-    
-    /*=================================================================================================*/
-    /*===================================== Document File Managment ===================================*/
-    /*=================================================================================================*/
-    
-    func saveImageToDocument(image: UIImage, fileName: String) -> String{
-        
-        let fileManager = NSFileManager.defaultManager()
-        
-        var paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as! String
-        
-        var filePathToWrite = "\(paths)/\(fileName)"
-        
-        var imageData: NSData = UIImageJPEGRepresentation(image, 1.0)
-        
-        fileManager.createFileAtPath(filePathToWrite, contents: imageData, attributes: nil)
-        
-        var getImagePath = paths.stringByAppendingPathComponent(fileName)
-        
-        return getImagePath
-    }
-    
-    func loadImageFromDocument(imagePath: String) -> UIImage? {
-        
-        if file_exists(imagePath){
-            return UIImage(contentsOfFile: imagePath)!
-        }else{
-            return nil
-        }
-    }
-    
-    func deleteImageFromDocument(imagePath: String){
-        
-        let fileManager = NSFileManager.defaultManager()
-        
-        if (fileManager.fileExistsAtPath(imagePath)){
-            
-            var error:NSError?
-            fileManager.removeItemAtPath(imagePath, error: &error)
-            
-            if let error = error{
-                println("Delete Error: \(error)")
-            }
-        }
-    }
-    
-    func file_exists(imagePath: String) -> Bool{
-        let fileManager = NSFileManager.defaultManager()
-        return fileManager.fileExistsAtPath(imagePath)
     }
 }
