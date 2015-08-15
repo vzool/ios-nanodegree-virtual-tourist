@@ -52,8 +52,6 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         
         if !long_pressed_once{
             
-            println("gestureHandler() called : PASSED \(!long_pressed_once) - \(long_pressed_once)")
-            
             let touchPoint = gestureRecognizer.locationInView(mapView)
             
             var newCoord:CLLocationCoordinate2D = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
@@ -64,8 +62,6 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                 Pin.Keys.LAT: "\(newCoord.latitude)",
                 Pin.Keys.LON: "\(newCoord.longitude)"
             ]
-            
-            println("dict: \(dict)")
             
             let pin = Pin(dict: dict, context: sharedContext)
             pin.current_page = 1
@@ -121,8 +117,6 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
     
     func showIndicator(state:Bool){
         
-        println("showIndicator(\(state)) called.")
-        
         indicator.hidden = !state
         navigationItem.leftBarButtonItem?.enabled = !state
         lpgr.enabled = !state
@@ -138,7 +132,13 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         showIndicator(true)
     }
     
-    func networkActivityError(){
+    func networkActivityError(error:NSError){
+        
+        var alert = UIAlertController(title: "Alert", message: "\(error)", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
+        
+        self.presentViewController(alert, animated: true, completion: nil)
+        
         showIndicator(false)
     }
     
@@ -181,6 +181,16 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
                 println("\(pin.pin.lat), \(pin.pin.lon)")
                 
                 selected_pin = pin.pin
+
+                var saved_correctly = true
+                for photo in pin.pin.photos{
+                    saved_correctly = saved_correctly && photo.is_saved
+                }
+                
+                if saved_correctly{
+                    pin.pin.is_images_saved = saved_correctly
+                    CoreDataStackManager.sharedInstance().saveContext()
+                }
                 
                 performSegueWithIdentifier("show_images", sender: self)
             }

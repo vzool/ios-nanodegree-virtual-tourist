@@ -12,5 +12,4 @@ class ImageCollectionCell: UICollectionViewCell {
 
     @IBOutlet weak var indicator: UIActivityIndicatorView!
     @IBOutlet weak var imageView: UIImageView!
-    
 }

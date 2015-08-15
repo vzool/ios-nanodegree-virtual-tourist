@@ -72,8 +72,6 @@ class Flickr{
     
     static internal func getImagesTotalPageFromFlickr(methodArguments: [String : AnyObject], view: UIViewController) {
         
-        println("Flickr.getImagesTotalPageFromFlickr() called.")
-        
         dispatch_async(dispatch_get_main_queue()){
             (view as? MapViewController)!.networkActivityStart()
         }
@@ -85,7 +83,13 @@ class Flickr{
         
         let task = session.dataTaskWithRequest(request) {data, response, downloadError in
             if let error = downloadError {
+                
                 println("Could not complete the request \(error)")
+                
+                dispatch_async(dispatch_get_main_queue()){
+                    (view as? MapViewController)!.networkActivityError(error)
+                }
+                
             } else {
                 
                 var parsingError: NSError? = nil
@@ -121,8 +125,6 @@ class Flickr{
     
     static internal func getImagesByGeo(methodArguments: [String : AnyObject], pageNumber: Int, view: UIViewController) {
         
-        println("Flickr.getImagesByGeo() called.")
-        
         dispatch_async(dispatch_get_main_queue()){
             (view as? PinImagesViewController)!.networkActivityStart()
         }
@@ -138,7 +140,13 @@ class Flickr{
         
         let task = session.dataTaskWithRequest(request) {data, response, downloadError in
             if let error = downloadError {
+                
                 println("Could not complete the request \(error)")
+                
+                dispatch_async(dispatch_get_main_queue()){
+                    (view as? PinImagesViewController)!.networkActivityError(error)
+                }
+                
             } else {
 
                 var parsingError: NSError? = nil

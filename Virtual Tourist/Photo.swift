@@ -15,10 +15,13 @@ class Photo : NSManagedObject{
     
     struct Keys{
         static let PATH = "path"
+        static let IsSaved = "is_saved"
     }
     
     @NSManaged var path:String?
     @NSManaged var pin:Pin?
+    
+    @NSManaged var is_saved:Bool
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -30,5 +33,7 @@ class Photo : NSManagedObject{
         super.init(entity: entity!, insertIntoManagedObjectContext: context)
         
         path = _path
+        
+        is_saved = false
     }
 }

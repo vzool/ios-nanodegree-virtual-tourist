@@ -21,6 +21,8 @@ class Pin : NSManagedObject{
         static let TotalPageCount = "total_page_count"
         static let CurrentPage = "current_page"
         static let TotalImages = "total_images"
+        
+        static let IsImagesSaved = "is_images_saved"
     }
     
     @NSManaged var lat: String
@@ -31,6 +33,8 @@ class Pin : NSManagedObject{
     @NSManaged var total_page_count:NSNumber
     @NSManaged var current_page:NSNumber
     @NSManaged var total_images:NSNumber
+    
+    @NSManaged var is_images_saved:Bool
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -45,6 +49,8 @@ class Pin : NSManagedObject{
         lon = dict[Keys.LON] as! String
         
         created_date = NSDate()
+        
+        is_images_saved = false
     }
 }
 

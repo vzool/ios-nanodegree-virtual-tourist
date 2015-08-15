@@ -38,7 +38,16 @@ class PinImagesViewController: UIViewController, MKMapViewDelegate, NSFetchedRes
         addPinToMapView(pin)
         
         if pin.current_page == 1{
-            newCollection()
+            
+            if !pin.is_images_saved{
+                
+                newCollection()
+                
+            }else{
+                
+                navigationItem.title = "Page: \(pin.current_page.integerValue) / \(pin.total_page_count.integerValue)"
+            }
+            
         }else{
             navigationItem.title = "Page: \(pin.current_page.integerValue) / \(pin.total_page_count.integerValue)"
         }
@@ -60,26 +69,84 @@ class PinImagesViewController: UIViewController, MKMapViewDelegate, NSFetchedRes
         
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("cell", forIndexPath: indexPath) as! ImageCollectionCell
         
-        let data = pin.photos[indexPath.item]
+        let photo = pin.photos[indexPath.item]
         
-        let url = data.path
-        
-        getDataFromUrl(NSURL(string: url!)!) { data in
-            dispatch_async(dispatch_get_main_queue()) {
-                cell.imageView.image = UIImage(data: data!)
-                cell.indicator.stopAnimating()
-                cell.indicator.hidden = true
+        if photo.is_saved {
+            
+            println("# READ IMAGE FROM CACHE #")
+            
+            cell.imageView.image = self.loadImageFromDocument(photo.path!)
+            
+        }else{
+            
+            println("# DOWNLOAD IMAGE FROM WWW #")
+            
+            getDataFromUrl(NSURL(string: photo.path!)!) { data in
+                
+                dispatch_async(dispatch_get_main_queue()) {
+                    
+                    if let data = data {
+                        
+                        var imageUrl = NSURL(fileURLWithPath: photo.path!)
+                        var fileName = imageUrl?.lastPathComponent
+                        
+                        let image = UIImage(data: data)
+                        
+                        let imagePath = self.saveImageToDocument(image!, fileName: fileName!)
+                        photo.path = imagePath
+                        
+                        cell.imageView.image = image
+                        
+                        photo.is_saved = true
+                        
+                        CoreDataStackManager.sharedInstance().saveContext()
+                        
+                    }else{
+                        
+                        self.sharedContext.deleteObject(photo)
+                    }
+                }
             }
         }
         
+        cell.indicator.stopAnimating()
+        cell.indicator.hidden = true
+
         return cell
     }
-    
     
     func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("cell", forIndexPath: indexPath) as! ImageCollectionCell
         cell.indicator.startAnimating()
         cell.indicator.hidden = false
+    }
+    
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        
+        let photo = pin.photos[indexPath.item]
+        
+        var alert = UIAlertController(title: "Alert", message: "Do you want to delete this image?", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: nil))
+        alert.addAction(UIAlertAction(title: "Yes", style: .Default, handler: { action in
+            switch action.style{
+            case .Default:
+                self.deleteImageFromDocument(photo.path!)
+                
+                self.sharedContext.deleteObject(photo)
+                
+                CoreDataStackManager.sharedInstance().saveContext()
+                
+                self.collectionView.reloadData()
+                
+            case .Cancel:
+                return
+                
+            case .Destructive:
+                return
+            }
+        }))
+        
+        self.presentViewController(alert, animated: true, completion: nil)
     }
     
     func getDataFromUrl(urL:NSURL, completion: ((data: NSData?) -> Void)) {
@@ -91,6 +158,7 @@ class PinImagesViewController: UIViewController, MKMapViewDelegate, NSFetchedRes
     func newCollection(){
         
         for photo in pin.photos{
+            deleteImageFromDocument(photo.path!)
             sharedContext.deleteObject(photo)
         }
         
@@ -122,7 +190,7 @@ class PinImagesViewController: UIViewController, MKMapViewDelegate, NSFetchedRes
     }
     
     @IBAction func requestNewCollection(sender: AnyObject) {
-        println("new Collection")
+        
         if(pin.current_page.integerValue < pin.total_page_count.integerValue){
             pin.current_page = NSNumber(integer: pin.current_page.integerValue + 1)
             CoreDataStackManager.sharedInstance().saveContext()
@@ -150,7 +218,7 @@ class PinImagesViewController: UIViewController, MKMapViewDelegate, NSFetchedRes
         word += photos.count > 1 ? "s" : ""
         
         if photos.count <= 0{
-            word = "no \(word)"
+            word = "No \(word)s"
         }else{
             word = "\(photos.count) \(word)"
         }
@@ -169,5 +237,63 @@ class PinImagesViewController: UIViewController, MKMapViewDelegate, NSFetchedRes
     func networkActivityStart(){
         newCollectionButton.enabled = false
         navigationItem.title = "Loading..."
+    }
+    
+    func networkActivityError(error:NSError){
+        
+        var alert = UIAlertController(title: "Alert", message: "\(error)", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
+        
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    /*=================================================================================================*/
+    /*===================================== Document File Managment ===================================*/
+    /*=================================================================================================*/
+    
+    func saveImageToDocument(image: UIImage, fileName: String) -> String{
+        
+        let fileManager = NSFileManager.defaultManager()
+        
+        var paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as! String
+        
+        var filePathToWrite = "\(paths)/\(fileName)"
+        
+        var imageData: NSData = UIImageJPEGRepresentation(image, 1.0)
+        
+        fileManager.createFileAtPath(filePathToWrite, contents: imageData, attributes: nil)
+        
+        var getImagePath = paths.stringByAppendingPathComponent(fileName)
+        
+        return getImagePath
+    }
+    
+    func loadImageFromDocument(imagePath: String) -> UIImage? {
+        
+        if file_exists(imagePath){
+            return UIImage(contentsOfFile: imagePath)!
+        }else{
+            return nil
+        }
+    }
+    
+    func deleteImageFromDocument(imagePath: String){
+        
+        let fileManager = NSFileManager.defaultManager()
+        
+        if (fileManager.fileExistsAtPath(imagePath)){
+            
+            var error:NSError?
+            fileManager.removeItemAtPath(imagePath, error: &error)
+            
+            if let error = error{
+                println("Delete Error: \(error)")
+            }
+        }
+    }
+    
+    func file_exists(imagePath: String) -> Bool{
+        let fileManager = NSFileManager.defaultManager()
+        return fileManager.fileExistsAtPath(imagePath)
     }
 }
